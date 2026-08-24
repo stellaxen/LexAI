@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LEX AI - main page</title>
+    <!-- Favicon για την καρτέλα -->
+    <link rel="icon" type="image/jpg" href="{{ url_for('static', filename='lexlogo.jpg') }}">
+</head>
+<body>
+
+    <!-- Κουτί για το λογότυπο πάνω αριστερά -->
+    <div style="position: absolute; top: 20px; right: 20px;">
+        <img src="{{ url_for('static', filename='lexlogo.jpg') }}" alt="LEX AI Logo" width="100">
+    </div>
+
+    <h1>
+        Hello from Lex Ai
+    </h1>
+    <form   method="POST" action="{{ url_for('index') }}">
+        <!-- <input type="text" name= "case_text" placeholder="Περιγραφή υπόθεσης"> -->
+        <textarea name="case_text" placeholder="Περιγραφή υπόθεσης..." rows="18" cols="180" style="padding: 5px;"></textarea>
+
+        <!-- Κουτί επιλογής γλώσσας (Dropdown) -->
+        <select name="language">
+            <option value="el">Ελληνικά</option>
+            <option value="en">English</option>
+        </select>
+
+        <!-- url logo -->
+
+    
+    
+
+
+        <input type="submit" value="Υποβολή">
+    </form>
+    <!-- ΕΒΑΛΑ ΑΥΤΟ ΤΟ ΚΟΜΜΑΤΙ ΓΙΑ PRINT-->
+     {% if text %}
+        <hr>
+        <h3>Η υπόθεση σας υπάγεται στα παρακάτω άρθρα:</h3>
+        <!-- <p><strong>{{text}}</strong></p>
+        {{text}} -->
+        {{ text | safe }}
+    {% endif %}
+</body>
+</html>

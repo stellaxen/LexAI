@@ -59,8 +59,8 @@ def beautify_answer(raw_string):
                 print(f"Κείμενο: {value['κείμενο']}")
                 print(f"Αρχείο: {value['αρχείο']}")
                 print("-" * 40)
-                # Χρησιμοποιούμε απλές αλλαγές γραμμής αντί για HTML tags
-                answer += f"\n\n{key}\n{value['κείμενο']}\nΑρχείο: {value['αρχείο']}\n" 
+                # Χρησιμοποιούμε απλές αλλαγές γραμμής αντί για HTML tags                
+                answer += f"\n\nΆρθρο: {key}\n{value['κείμενο']}\nΑρχείο: {value['αρχείο']}\n" 
         else:
             answer = "Δε βρέθηκε υπαγωγή για την περίπτωση σας."
             
@@ -174,7 +174,16 @@ def generate_doc(filename, articles):
     doc = DocxTemplate(template_path)
     
     context = {
-        "client_name": "Γιάννης Παπαδόπουλος",
+        "caller_name": "Γιάννης",
+        "caller_surname": "Παπαδόπουλος",
+        "caller_fathers_name": "Κωνσταντίνος",
+        "caller_tax_id": "123456789",
+        "caller_address": "Οδός 123, Πόλη 12345",
+        "calling_name": "Κώστας",
+        "calling_surname": "Γεωργίου",
+        "calling_fathers_name": "Ιωάννης",
+        "calling_tax_id": "089654323",
+        "calling_address": "Οδός Λιβανου 125,  Χίος 82131",
         "date": datetime.now().strftime("%d/%m/%Y"),
         "articles": str(articles) if articles else "Δε βρέθηκε υπαγωγή",
     }

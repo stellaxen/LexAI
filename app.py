@@ -1,6 +1,9 @@
 import datetime
 import os
+import unicodedata
 from dotenv import load_dotenv  # 1. Εισαγωγή της βιβλιοθήκης
+
+from models import Person  # 2. Εισαγωγή του μοντέλου Person από το αρχείο models.py
 
 # Φόρτωση των μεταβλητών από το αρχείο .env
 load_dotenv()
@@ -60,7 +63,7 @@ def beautify_answer(raw_string):
                 print(f"Αρχείο: {value['αρχείο']}")
                 print("-" * 40)
                 # Χρησιμοποιούμε απλές αλλαγές γραμμής αντί για HTML tags                
-                answer += f"\n\nΆρθρο: {key}\n{value['κείμενο']}\nΑρχείο: {value['αρχείο']}\n" 
+                answer += f"\n\n{key}\n{value['κείμενο']}\nΑρχείο: {value['αρχείο']}\n" 
         else:
             answer = "Δε βρέθηκε υπαγωγή για την περίπτωση σας."
             
@@ -112,12 +115,28 @@ def index():
         }
         }
         """
+
+        caller = Person(
+            name=request.form.get('caller_name'),
+            surname=request.form.get('caller_surname'),
+            fathers_name=request.form.get('caller_fathers_name'),
+            address=request.form.get('caller_address'),
+            tax_id=request.form.get('caller_tax_id')
+        )
+        calling = Person(
+            name=request.form.get('calling_name'),
+            surname=request.form.get('calling_surname'),
+            fathers_name=request.form.get('calling_fathers_name'),
+            address=request.form.get('calling_address'),
+            tax_id=request.form.get('calling_tax_id')
+        )
+
         prompt_text = request.form.get('case_text') + rest_prompt
         case_text = make_answer(prompt_text, rag_index)
         
         try:
             # 1. Δημιουργία του αρχείου Word
-            docx_path = generate_doc("ypagogi.docx", case_text)  
+            docx_path = generate_doc("ypagogi.docx", case_text, caller, calling)  
             output_dir = "output_pdfs"  
             os.makedirs(output_dir, exist_ok=True)
 
@@ -165,25 +184,111 @@ def index():
             print(f"⚠️ PDF Conversion Exception: {e}")
             return f"Error: {e}", 500
 
+def remove_accents(input_str):
+    """Αφαιρεί τους τόνους από μια ελληνική λέξη."""
+    nfkd_form = unicodedata.normalize('NFKD', input_str)
+    return "".join([c for c in nfkd_form if not unicodedata.combining(c)])
 
-def generate_doc(filename, articles):
+def guess_greek_gender(name):
+    if not name:
+        return "Του/Της"
+        
+    # 1. Μετατροπή σε πεζά
+    name = name.strip().lower()
+    
+    # 2. Αντικατάσταση τυχόν κεφαλαίου 'Σ' ή μεσαίου 'σ' στο τέλος σε τελικό 'ς' 
+    # (για να ταιριάζουν σωστά οι καταλήξεις)
+    if name.endswith('σ') or name.endswith('Σ'):
+        name = name[:-1] + 'ς'
+        
+    # 3. Αφαίρεση τόνων (π.χ. 'ά' -> 'α', 'ή' -> 'η')
+    name_no_accent = remove_accents(name)
+    
+    # Συνήθεις γυναικείες καταλήξεις (χωρίς τόνους)
+    female_endings = ('η', 'α', 'ου', 'ω')
+    # Συνήθεις αντρικές καταλήξεις (χωρίς τόνους)
+    male_endings = ('ης', 'ας', 'ος', 'ες')
+    
+    # Έλεγχος με βάση τις καταλήξεις χωρίς τόνους
+    if name_no_accent.endswith(male_endings):
+        return "Του"
+    elif name_no_accent.endswith(female_endings):
+        return "Της"
+    else:
+        return "Του/Της"
+
+def to_genitive_first_name(name):
+    name = name.strip()
+    if not name:
+        return ""
+    
+    last_char = name[-1].lower()
+    last_two = name[-2:].lower() if len(name) >= 2 else ""
+    
+    # 1. Αρσενικά σε -ης (π.χ. Γιάννης -> Γιάννη)
+    if last_two == "ης":
+        return name[:-1] # Κόβει το 'ς' -> Γιάννη
+        
+    # 2. Αρσενικά σε -ος (π.χ. Γιώργος -> Γιώργου)
+    elif last_two == "ος":
+        return name[:-2] + "ου" # Γιώργου
+        
+    # 3. Αρσενικά σε -ας (π.χ. Κώστας -> Κώστα)
+    elif last_two == "ας":
+        return name[:-1] # Κώστα
+        
+    # 4. Γυναικεία σε -η (π.χ. Ελένη -> Ελένης)
+    elif last_char == "η":
+        return name + "ς" # Ελένης
+        
+    # 5. Γυναικεία σε -α (π.χ. Μαρία -> Μαρίας)
+    elif last_char == "α":
+        return name + "ς" # Μαρίας
+        
+    # 6. Γυναικεία σε -ου (π.χ. Αλεξοῦ -> Αλεξούς - σπάνιο, ή μένει ως έχει)
+    return name.upper()  
+
+def to_genitive_last_name(surname):
+    surname = surname.strip()
+    if not surname:
+        return ""
+    
+    last_two = surname[-2:].lower() if len(surname) >= 2 else ""
+    
+    # Τα περισσότερα ελληνικά επώνυμα ακολουθούν κανόνες:
+    # -όπουλος, -άκης, -ίδης κλπ. λήγουν σε -ος -> γίνονται -ου
+    if last_two == "ος":
+        return surname[:-2] + "ου"
+    
+    # Επώνυμα που λήγουν σε -ης (π.χ. Χατζής -> Χατζή)
+    elif last_two == "ης":
+        return surname[:-1]
+        
+    # Άκλιτα ή ξενικά επώνυμα
+    return surname.upper()  
+
+
+
+def generate_doc(filename, articles, caller: Person, calling: Person):
     template_path = os.path.join("templates_files", filename)
     if not os.path.exists(template_path):
         raise FileNotFoundError(f"Το αρχείο πρότυπο δεν βρέθηκε στο: {template_path}")
         
-    doc = DocxTemplate(template_path)
+    doc = DocxTemplate(template_path)    
     
     context = {
-        "caller_name": "Γιάννης",
-        "caller_surname": "Παπαδόπουλος",
-        "caller_fathers_name": "Κωνσταντίνος",
-        "caller_tax_id": "123456789",
-        "caller_address": "Οδός 123, Πόλη 12345",
-        "calling_name": "Κώστας",
-        "calling_surname": "Γεωργίου",
-        "calling_fathers_name": "Ιωάννης",
-        "calling_tax_id": "089654323",
-        "calling_address": "Οδός Λιβανου 125,  Χίος 82131",
+        "caller_gender": guess_greek_gender(caller.name),
+        "caller_name": to_genitive_first_name(caller.name).upper(),
+        "caller_surname": to_genitive_last_name(caller.surname).upper(),
+        "caller_fathers_name": caller.fathers_name.upper(),
+        "caller_tax_id": caller.tax_id,
+        "caller_address": caller.address.upper(),
+        "calling_gender": guess_greek_gender(calling.name),
+        "calling_name": to_genitive_first_name(calling.name).upper(),
+        "calling_surname": to_genitive_last_name(calling.surname).upper(),
+        "calling_fathers_name": calling.fathers_name.upper(),
+        "calling_tax_id": calling.tax_id,
+        "calling_address": calling.address.upper(),
         "date": datetime.now().strftime("%d/%m/%Y"),
         "articles": str(articles) if articles else "Δε βρέθηκε υπαγωγή",
     }

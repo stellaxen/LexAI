@@ -18,35 +18,35 @@
         Lex Ai
     </h1>
     <form   method="POST" action="{{ url_for('index') }}">
-        <input type="text" name="caller_name" placeholder="Oνομα καλούντος" style="width: 350px; padding: 10px; margin-bottom: 10px;">
-        <input type="text" name="caller_surname" placeholder="Eπώνυμο καλούντος" style="width: 350px; padding: 10px; margin-bottom: 10px;">
-        <input type="text" name="caller_fathers_name" placeholder="Όνομα πατέρα" style="width: 350px; padding: 10px; margin-bottom: 10px;">
+        <input type="text" name="caller_name" placeholder="Oνομα καλούντος" style="width: 350px; padding: 10px; margin-bottom: 10px;" required>
+        <input type="text" name="caller_surname" placeholder="Eπώνυμο καλούντος" style="width: 350px; padding: 10px; margin-bottom: 10px;" required>
+        του
+        <input type="text" name="caller_fathers_name" placeholder="Όνομα πατρός" style="width: 350px; padding: 10px; margin-bottom: 10px;" required>
         <br>
-        <input type="text" name="caller_address" placeholder="Διεύθυνση καλούντος" style="width: 350px; padding: 10px; margin-bottom: 10px;">
-        <input type="text" name="caller_tax_id" placeholder="ΑΦΜ καλούντος" style="width: 350px; padding: 10px; margin-bottom: 10px;">
+        <input type="text" name="caller_address" placeholder="Διεύθυνση καλούντος" style="width: 350px; padding: 10px; margin-bottom: 10px;" required>
+        <input type="text" name="caller_tax_id" placeholder="ΑΦΜ καλούντος" style="width: 350px; padding: 10px; margin-bottom: 10px;" required>
         <br><br>
-        <input type="text" name="calling_name" placeholder="Oνομα καλούμενου" style="width: 350px; padding: 10px; margin-bottom: 10px;">
-        <input type="text" name="calling_surname" placeholder="Eπώνυμο καλούμενου" style="width: 350px; padding: 10px; margin-bottom: 10px;">
-        <input type="text" name="calling_fathers_name" placeholder="Όνομα πατέρα" style="width: 350px; padding: 10px; margin-bottom: 10px;">
+        <input type="text" name="calling_name" placeholder="Oνομα καλούμενου" style="width: 350px; padding: 10px; margin-bottom: 10px;" required>
+        <input type="text" name="calling_surname" placeholder="Eπώνυμο καλούμενου" style="width: 350px; padding: 10px; margin-bottom: 10px;" required>
+        του
+        <input type="text" name="calling_fathers_name" placeholder="Όνομα πατρός" style="width: 350px; padding: 10px; margin-bottom: 10px;" required>
         <br>
         <input type="text" name="calling_address" placeholder="Διεύθυνση καλούμενου" style="width: 350px; padding: 10px; margin-bottom: 10px;">
         <input type="text" name="calling_tax_id" placeholder="ΑΦΜ καλούμενου" style="width: 350px; padding: 10px; margin-bottom: 10px;">
         <br><br>
-        <textarea name="case_text" placeholder="Περιγραφή υπόθεσης..." rows="18" cols="180" style="padding: 5px;"></textarea>
+        <textarea name="case_text" placeholder="Περιγραφή υπόθεσης..." rows="18" cols="180" style="padding: 5px;" required></textarea>
+        
         <br><br>
         <!-- Κουτί επιλογής γλώσσας (Dropdown) -->
         <select name="language">
             <option value="el">Ελληνικά</option>
             <option value="en">English</option>
         </select>
-
-        <!-- url logo -->
-
-    
-    
-
-
+        <br><br>
+        
+        <input type="reset" value="Εκκαθάριση">
         <input type="submit" value="Υποβολή">
+
     </form>
     <!-- ΕΒΑΛΑ ΑΥΤΟ ΤΟ ΚΟΜΜΑΤΙ ΓΙΑ PRINT-->
      {% if text %}
@@ -57,4 +57,22 @@
         {{ text | safe }}
     {% endif %}
 </body>
+
+<script>
+  // Επιλέγει ΟΛΑ τα input ΚΑΙ textarea που έχουν την ιδιότητα required
+  document.querySelectorAll('input[required], textarea[required]').forEach(element => {
+    
+    // Όταν προσπαθεί να υποβάλει με κενό πεδίο
+    element.addEventListener('invalid', () => {
+      element.setCustomValidity('Το πεδίο αυτό είναι υποχρεωτικό.');
+    });
+
+    // Όταν ο χρήστης πληκτρολογεί, καθαρίζει το λάθος
+    element.addEventListener('input', () => {
+      element.setCustomValidity('');
+    });
+    
+  });
+</script>
+
 </html>

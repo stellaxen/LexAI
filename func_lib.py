@@ -1,4 +1,4 @@
-import json,zipfile, shutil, os
+import json,zipfile, shutil, os, text_lib
 from docxtpl import DocxTemplate
 from datetime import datetime
 
@@ -83,15 +83,15 @@ def generate_doc(filename, articles, caller: Person, calling: Person):
     doc = DocxTemplate(template_path)    
     
     context = {
-        "caller_gender": guess_greek_gender(caller.name),
-        "caller_name": to_genitive_first_name(caller.name).upper(),
-        "caller_surname": to_genitive_last_name(caller.surname).upper(),
+        "caller_gender": text_lib.guess_greek_gender(caller.name),
+        "caller_name": text_lib.to_genitive_first_name(caller.name).upper(),
+        "caller_surname": text_lib.to_genitive_last_name(caller.surname).upper(),
         "caller_fathers_name": caller.fathers_name.upper(),
         "caller_tax_id": caller.tax_id,
         "caller_address": caller.address.upper(),
-        "calling_gender": guess_greek_gender(calling.name),
-        "calling_name": to_genitive_first_name(calling.name).upper(),
-        "calling_surname": to_genitive_last_name(calling.surname).upper(),
+        "calling_gender": text_lib.guess_greek_gender(calling.name),
+        "calling_name": text_lib.to_genitive_first_name(calling.name).upper(),
+        "calling_surname": text_lib.to_genitive_last_name(calling.surname).upper(),
         "calling_fathers_name": calling.fathers_name.upper(),
         "calling_tax_id": calling.tax_id,
         "calling_address": calling.address.upper(),
@@ -101,7 +101,7 @@ def generate_doc(filename, articles, caller: Person, calling: Person):
     
     doc.render(context)
     
-    output_path = os.path.join(TEMP_FOLDER, "1.docx")
+    output_path = os.path.join( os.getenv("TEMP_FOLDER"), "1.docx")
     
     doc.save(output_path)
     

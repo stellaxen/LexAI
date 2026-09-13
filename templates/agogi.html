@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Αγωγή - Lex Ai</title>
+    <!-- Favicon για την καρτέλα -->
+    <link rel="icon" type="image/jpg" href="{{ url_for('static', filename='images/lexlogo.jpg') }}">
+</head>
+<body>
+    <!-- Κουτί για το λογότυπο πάνω αριστερά -->
+    <div style="position: absolute; top: 20px; right: 20px;">
+        <a href="{{ url_for('index') }}">
+          <img src="{{ url_for('static', filename='lexlogo.jpg') }}" alt="LEX AI Logo" width="100">
+        </a>
+    </div>
+    <h1>
+        Αγωγή - Lex Ai
+    </h1>
+    <form method="POST" action="{{ url_for('agogi') }}">
+        <input type="text" name="caller_name" placeholder="Oνομα καλούντος" style="width: 350px; padding: 10px; margin-bottom: 10px;" required>
+        <input type="text" name="caller_surname" placeholder="Eπώνυμο καλούντος" style="width: 350px; padding: 10px; margin-bottom: 10px;" required>
+        του
+        <input type="text" name="caller_fathers_name" placeholder="Όνομα πατρός" style="width: 350px; padding: 10px; margin-bottom: 10px;" required>
+        <br>
+        <input type="text" name="caller_address" placeholder="Διεύθυνση καλούντος" style="width: 350px; padding: 10px; margin-bottom: 10px;" required>              
+        <input type="text" name="caller_tax_id" placeholder="ΑΦΜ καλούντος" maxlength="9" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')" style="width: 350px; padding: 10px; margin-bottom: 10px;">
+        <br><br>
+        <input type="text" name="calling_name" placeholder="Oνομα καλούμενου" style="width: 350px; padding: 10px; margin-bottom: 10px;" required>
+        <input type="text" name="calling_surname" placeholder="Eπώνυμο καλούμενου" style="width: 350px; padding: 10px; margin-bottom: 10px;" required>
+        του
+        <input type="text" name="calling_fathers_name" placeholder="Όνομα πατρός" style="width: 350px; padding: 10px; margin-bottom: 10px;" required>
+        <br>
+        <input type="text" name="calling_address" placeholder="Διεύθυνση καλούμενου" style="width: 350px; padding: 10px; margin-bottom: 10px;">       
+        <input type="text" name="calling_tax_id" placeholder="ΑΦΜ καλούμενου" maxlength="9" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')" style="width: 350px; padding: 10px; margin-bottom: 10px;">
+        <br><br>
+        <textarea name="case_text" placeholder="Περιγραφή υπόθεσης..." rows="18" cols="180" style="padding: 5px;" required></textarea>        
+        <br><br>              
+        <input type="reset" value="Εκκαθάριση">
+        <input type="submit" value="Υποβολή">
+    </form>
+    <!-- ΕΒΑΛΑ ΑΥΤΟ ΤΟ ΚΟΜΜΑΤΙ ΓΙΑ PRINT-->
+     {% if text %}
+        <hr>
+        <h3>Η υπόθεση σας υπάγεται στα παρακάτω άρθρα:</h3>
+        <!-- <p><strong>{{text}}</strong></p>
+        {{text}} -->
+        {{ text | safe }}
+    {% endif %}
+    <a href="{{ url_for('index') }}">
+      Επιστροφή στην αρχική σελίδα
+    </a>
+</body>
+
+<script src="{{ url_for('static', filename='js/form-validation.js') }}"></script>
+
+</html>

@@ -1,67 +1,119 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="el">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LEX AI - main page</title>
-    <!-- Favicon για την καρτέλα -->
-    <link rel="icon" type="image/jpg" href="{{ url_for('static', filename='lexlogo.jpg') }}">
+    <title>Lex AI - Νομικός Βοηθός</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/jpg" href="{{ url_for('static', filename='images/lexlogo.jpg') }}">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts (Playfair Display για πολυτελές νομικό στυλ) -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <!-- FontAwesome για εικονίδια -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Εξωτερικό Custom CSS Αρχείο -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <!-- Κουτί για το λογότυπο πάνω αριστερά -->
-    <div style="position: absolute; top: 20px; right: 20px;">
-        <img src="{{ url_for('static', filename='lexlogo.jpg') }}" alt="LEX AI Logo" width="100">
-    </div>
-    <h1>
-        Lex Ai
-    </h1>
-    <form method="POST" action="{{ url_for('index') }}">
-        <input type="text" name="caller_name" placeholder="Oνομα καλούντος" style="width: 350px; padding: 10px; margin-bottom: 10px;" required>
-        <input type="text" name="caller_surname" placeholder="Eπώνυμο καλούντος" style="width: 350px; padding: 10px; margin-bottom: 10px;" required>
-        του
-        <input type="text" name="caller_fathers_name" placeholder="Όνομα πατρός" style="width: 350px; padding: 10px; margin-bottom: 10px;" required>
-        <br>
-        <input type="text" name="caller_address" placeholder="Διεύθυνση καλούντος" style="width: 350px; padding: 10px; margin-bottom: 10px;" required>              
-        <input type="text" name="caller_tax_id" placeholder="ΑΦΜ καλούντος" maxlength="9" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')" style="width: 350px; padding: 10px; margin-bottom: 10px;">
-        <br><br>
-        <input type="text" name="calling_name" placeholder="Oνομα καλούμενου" style="width: 350px; padding: 10px; margin-bottom: 10px;" required>
-        <input type="text" name="calling_surname" placeholder="Eπώνυμο καλούμενου" style="width: 350px; padding: 10px; margin-bottom: 10px;" required>
-        του
-        <input type="text" name="calling_fathers_name" placeholder="Όνομα πατρός" style="width: 350px; padding: 10px; margin-bottom: 10px;" required>
-        <br>
-        <input type="text" name="calling_address" placeholder="Διεύθυνση καλούμενου" style="width: 350px; padding: 10px; margin-bottom: 10px;">       
-        <input type="text" name="calling_tax_id" placeholder="ΑΦΜ καλούμενου" maxlength="9" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')" style="width: 350px; padding: 10px; margin-bottom: 10px;">
-        <br><br>
-        <textarea name="case_text" placeholder="Περιγραφή υπόθεσης..." rows="18" cols="180" style="padding: 5px;" required></textarea>        
-        <br><br>              
-        <input type="reset" value="Εκκαθάριση">
-        <input type="submit" value="Υποβολή">
-    </form>
-    <!-- ΕΒΑΛΑ ΑΥΤΟ ΤΟ ΚΟΜΜΑΤΙ ΓΙΑ PRINT-->
-     {% if text %}
-        <hr>
-        <h3>Η υπόθεση σας υπάγεται στα παρακάτω άρθρα:</h3>
-        <!-- <p><strong>{{text}}</strong></p>
-        {{text}} -->
-        {{ text | safe }}
-    {% endif %}
+    <!-- Header / Logo Section -->
+    <header class="container text-center py-5">
+        <div class="d-flex flex-column align-items-center justify-content-center">
+            <!-- Στρογγυλό Logo με χρυσαφί περίγραμμα και απαλή σκιά -->
+            <img src="{{ url_for('static', filename='images/lexlogo.jpg') }}" alt="LEX AI Logo" width="85" class="rounded-circle shadow-lg border border-warning mb-3" style="border-width: 2px !important;">
+            <h1 class="h2 m-0 text-light fw-bold brand-title-main">Lex AI</h1>
+            <div class="mt-2 header-divider"></div>
+        </div>
+    </header>
+
+    <!-- Main Content / Menu Options -->
+    <main class="container my-auto py-4">
+        <div class="text-center mb-5">
+            <h2 class="brand-title h4 text-light">Επιλέξτε Νομική Ενέργεια</h2>
+            <p class="text-muted small">Επιλέξτε την κατηγορία που επιθυμείτε για αυτόματη σύνταξη εγγράφου μέσω Τεχνητής Νοημοσύνης.</p>
+        </div>
+
+        <div class="row g-3 justify-content-center">
+            <!-- Υπαγωγή -->
+            <div class="col-12 col-md-6 col-lg-5">
+                <a href="{{ url_for('ypagogi') }}" class="menu-link">
+                    <div class="p-3 rounded-4 gold-border d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="bg-dark p-3 rounded-3 text-warning border border-secondary">
+                                <i class="fa-solid fa-file-lines fa-lg"></i>
+                            </div>
+                            <div>
+                                <h5 class="m-0 text-light fw-bold">Υπαγωγή</h5>
+                                <small class="text-muted">Δημιουργία φακέλου υπαγωγής</small>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-warning"></i>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Εξώδικο -->
+            <div class="col-12 col-md-6 col-lg-5">
+                <a href="{{ url_for('exodiko') }}" class="menu-link">
+                    <div class="p-3 rounded-4 gold-border d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="bg-dark p-3 rounded-3 text-warning border border-secondary">
+                                <i class="fa-solid fa-envelope-open-text fa-lg"></i>
+                            </div>
+                            <div>
+                                <h5 class="m-0 text-light fw-bold">Εξώδικο</h5>
+                                <small class="text-muted">Σύνταξη εξώδικης δήλωσης</small>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-warning"></i>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Αγωγή -->
+            <div class="col-12 col-md-6 col-lg-5">
+                <a href="{{ url_for('agogi') }}" class="menu-link">
+                    <div class="p-3 rounded-4 gold-border d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="bg-dark p-3 rounded-3 text-warning border border-secondary">
+                                <i class="fa-solid fa-gavel fa-lg"></i>
+                            </div>
+                            <div>
+                                <h5 class="m-0 text-light fw-bold">Αγωγή</h5>
+                                <small class="text-muted">Νομική τεκμηρίωση αγωγής</small>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-warning"></i>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Ασφαλιστικά μέτρα -->
+            <div class="col-12 col-md-6 col-lg-5">
+                <a href="{{ url_for('asfalistika') }}" class="menu-link">
+                    <div class="p-3 rounded-4 gold-border d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="bg-dark p-3 rounded-3 text-warning border border-secondary">
+                                <i class="fa-solid fa-shield-halved fa-lg"></i>
+                            </div>
+                            <div>
+                                <h5 class="m-0 text-light fw-bold">Ασφαλιστικά Μέτρα</h5>
+                                <small class="text-muted">Αίτηση προσωρινής προστασίας</small>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-warning"></i>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-3 text-muted small">
+        <p class="m-0">&copy; 2026 Lex AI. Με επιφύλαξη παντός δικαιώματος.</p>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
-<script>
-  // Επιλέγει ΟΛΑ τα input ΚΑΙ textarea που έχουν την ιδιότητα required
-  document.querySelectorAll('input[required], textarea[required]').forEach(element => {
-    
-    // Όταν προσπαθεί να υποβάλει με κενό πεδίο
-    element.addEventListener('invalid', () => {
-      element.setCustomValidity('Το πεδίο αυτό είναι υποχρεωτικό.');
-    });
-
-    // Όταν ο χρήστης πληκτρολογεί, καθαρίζει το λάθος
-    element.addEventListener('input', () => {
-      element.setCustomValidity('');
-    });
-    
-  });
-</script>
-
 </html>

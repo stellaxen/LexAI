@@ -23,14 +23,18 @@ if not API_KEY:
 rag_index = func_lib.initialize_rag_system(data_dir="./legal_docs", api_key=API_KEY)
 
 # Δημιουργία φακέλου temp αν δεν υπάρχει
-TEMP_FOLDER = "temp"
-os.makedirs(TEMP_FOLDER, exist_ok=True)
+os.makedirs( os.getenv("TEMP_FOLDER"), exist_ok=True)
 
 
 @app.route('/', methods={'GET', 'POST'})
 def index():
+    return render_template('index.html')
+
+
+@app.route('/ypagogi', methods={'GET', 'POST'})
+def ypagogi():
     if request.method == 'GET':
-        return render_template('index.html')
+        return render_template('ypagogi.html')
     elif request.method == 'POST':
         rest_prompt = """ΑΠΑΝΤΗΣΕ ΑΠΟΚΛΕΙΣΤΙΚΑ ΚΑΙ ΜΟΝΟ ΜΕ ΕΝΑ ΕΓΚΥΡΟ JSON. Μην γράψεις καμία άλλη λέξη, πρόταση, εισαγωγή ή επεξήγηση πριν ή μετά το JSON. Μη χρησιμοποιήσεις markdown blocks (όπως ```json). 
         Η δομή του JSON πρέπει να είναι ακριβώς η εξής:
@@ -113,17 +117,17 @@ def index():
 
 @app.route('/exodiko')
 def exodiko():
-    return '<h1>Exodiko Page!</h1>'
+    return render_template('exodiko.html')
 
 
 @app.route('/asfalistika')
 def asfalistika():
-    return '<h1>asfalistika metra!!</h1>'
+    return render_template('asfalistika.html')
 
 
-@app.route('/ypagogi')
-def ypagogi():
-    return '<h1>ypagogi page!!</h1>'
+@app.route('/agogi')
+def agogi():
+    return render_template('agogi.html')
 
 
 if __name__ == '__main__':

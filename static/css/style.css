@@ -1,0 +1,58 @@
+body {
+    background-color: #0b0f19;
+    color: #f8f9fa;
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+h1, .brand-title {
+    font-family: 'Playfair Display', serif;
+    letter-spacing: 1px;
+    color: #dfbe7d;
+}
+
+.brand-title-main {
+    font-family: 'Playfair Display', serif;
+    letter-spacing: 2px;
+}
+
+.header-divider {
+    width: 40px; 
+    height: 2px; 
+    background-color: #dfbe7d;
+}
+
+.gold-border {
+    border: 1px solid rgba(223, 190, 125, 0.3);
+    background: rgba(18, 24, 38, 0.7);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.gold-border:hover {
+    border-color: #dfbe7d;
+    box-shadow: 0 0 15px rgba(223, 190, 125, 0.2);
+    transform: translateY(-3px);
+}
+
+.btn-gold {
+    background: linear-gradient(135deg, #dfbe7d 0%, #b89753 100%);
+    color: #0b0f19;
+    font-weight: 600;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-gold:hover {
+    background: linear-gradient(135deg, #ebd096 0%, #dfbe7d 100%);
+    color: #000;
+    box-shadow: 0 0 20px rgba(223, 190, 125, 0.4);
+}
+
+.menu-link {
+    text-decoration: none;
+    color: inherit;
+}

@@ -1,9 +1,4 @@
-import json,zipfile, shutil, os, text_lib
-from docxtpl import DocxTemplate
-from datetime import datetime
-
-from models import Person  # Εισαγωγή του μοντέλου Person από το αρχείο models.py
-    
+import json,zipfile, shutil, os, text_lib    
 from llama_index.core import Settings, SimpleDirectoryReader, VectorStoreIndex
 from llama_index.core.node_parser import SentenceSplitter
 from llama_index.llms.openai import OpenAI
@@ -75,45 +70,5 @@ def make_answer(case_text, res):
     response = str(response)
     return beautify_answer(response)
 
-def generate_doc(filename, articles, caller: Person, calling: Person):
-    template_path = os.path.join("templates_files", filename)
-    if not os.path.exists(template_path):
-        raise FileNotFoundError(f"Το αρχείο πρότυπο δεν βρέθηκε στο: {template_path}")
-        
-    doc = DocxTemplate(template_path)    
-    
-    context = {
-        "caller_gender": text_lib.guess_greek_gender(caller.name),
-        "caller_name": text_lib.to_genitive_first_name(caller.name).upper(),
-        "caller_surname": text_lib.to_genitive_last_name(caller.surname).upper(),
-        "caller_fathers_name": caller.fathers_name.upper(),
-        "caller_tax_id": caller.tax_id,
-        "caller_address": caller.address.upper(),
-        "calling_gender": text_lib.guess_greek_gender(calling.name),
-        "calling_name": text_lib.to_genitive_first_name(calling.name).upper(),
-        "calling_surname": text_lib.to_genitive_last_name(calling.surname).upper(),
-        "calling_fathers_name": calling.fathers_name.upper(),
-        "calling_tax_id": calling.tax_id,
-        "calling_address": calling.address.upper(),
-        "date": datetime.now().strftime("%d/%m/%Y"),
-        "articles": str(articles) if articles else "Δε βρέθηκε υπαγωγή",
-    }
-    
-    doc.render(context)
-    
-    output_path = os.path.join( os.getenv("TEMP_FOLDER"), "1.docx")
-    
-    doc.save(output_path)
-    
-    temp_zip_path = output_path + ".tmp"
-    
-    with zipfile.ZipFile(output_path, 'r') as zin:
-        with zipfile.ZipFile(temp_zip_path, 'w') as zout:
-            for item in zin.infolist():
-                if item.filename != 'docProps/core.xml':
-                    zout.writestr(item, zin.read(item.filename))
-                    
-    shutil.move(temp_zip_path, output_path)
-    
-    return output_path
+
 

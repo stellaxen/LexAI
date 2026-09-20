@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Εξώδικο - Lex AI</title>
+    <!-- Favicon για την καρτέλα -->
+    <link rel="icon" type="image/jpg" href="{{ url_for('static', filename='images/lexlogo.jpg') }}">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts (Playfair Display & Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <!-- FontAwesome για εικονίδια -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Εξωτερικό Custom CSS Αρχείο -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">       
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+    <!-- Header / Logo Section -->
+    <header class="container text-center py-5">
+        <div class="d-flex flex-column align-items-center justify-content-center position-relative">
+            <!-- Κουμπί επιστροφής / Logo πάνω αριστερά -->
+            <a href="{{ url_for('index') }}" class="position-absolute start-0 top-0 text-warning text-decoration-none d-flex align-items-center gap-2 mt-2">
+                <i class="fa-solid fa-arrow-left"></i> <span class="d-none d-sm-inline">Αρχική</span>
+            </a>
+            <img src="{{ url_for('static', filename='images/lexlogo.jpg') }}" alt="LEX AI Logo" width="85" class="rounded-circle shadow-lg border border-warning mb-3" style="border-width: 2px !important;">
+            <h1 class="h2 m-0 text-light fw-bold brand-title-main">Εξώδικο - Lex AI</h1>
+            <div class="mt-2 header-divider"></div>
+        </div>
+    </header>
+
+    <!-- Main Content / Form Section -->
+    <main class="container my-auto py-4" style="max-width: 900px;">
+        <div class="text-center mb-5">
+            <h2 class="brand-title h4 text-light">Σύνταξη Εξώδικης Δήλωσης</h2>
+            <p class="text-muted small">Συμπληρώστε τα στοιχεία των εμπλεκομένων μερών και την περιγραφή της υπόθεσης.</p>
+        </div>
+
+        <div class="p-4 p-md-5 rounded-4 gold-border bg-black border border-secondary shadow-lg">
+            <form method="POST" action="{{ url_for('exodiko_misthosis') }}">
+                
+                <!-- Στοιχεία Καλούντος -->
+                <div class="mb-4">
+                    <h5 class="text-warning fs-6 mb-3 border-bottom border-secondary pb-2">
+                        <i class="fa-solid fa-user me-2"></i> Στοιχεία Καλούντος
+                    </h5>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <input type="text" name="caller_name" class="form-control bg-dark text-light border-secondary" placeholder="Όνομα καλούντος" required>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" name="caller_surname" class="form-control bg-dark text-light border-secondary" placeholder="Επώνυμο καλούντος" required>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" name="caller_fathers_name" class="form-control bg-dark text-light border-secondary" placeholder="Όνομα πατρός καλούντος" required>
+                        </div>
+                        <div class="col-md-7">
+                            <input type="text" name="caller_address" class="form-control bg-dark text-light border-secondary" placeholder="Διεύθυνση καλούντος" required>
+                        </div>
+                        <div class="col-md-5">
+                            <input type="text" name="caller_tax_id" class="form-control bg-dark text-light border-secondary" placeholder="ΑΦΜ καλούντος" maxlength="9" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Στοιχεία Καλούμενου -->
+                <div class="mb-4">
+                    <h5 class="text-warning fs-6 mb-3 border-bottom border-secondary pb-2">
+                        <i class="fa-solid fa-user-pen me-2"></i> Στοιχεία Καλούμενου
+                    </h5>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <input type="text" name="calling_name" class="form-control bg-dark text-light border-secondary" placeholder="Όνομα καλούμενου" required>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" name="calling_surname" class="form-control bg-dark text-light border-secondary" placeholder="Επώνυμο καλούμενου" required>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" name="calling_fathers_name" class="form-control bg-dark text-light border-secondary" placeholder="Όνομα πατρός καλούμενου" required>
+                        </div>
+                        <div class="col-md-7">
+                            <input type="text" name="calling_address" class="form-control bg-dark text-light border-secondary" placeholder="Διεύθυνση καλούμενου">
+                        </div>
+                        <div class="col-md-5">
+                            <input type="text" name="calling_tax_id" class="form-control bg-dark text-light border-secondary" placeholder="ΑΦΜ καλούμενου" maxlength="9" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Στοιχεία Μίσθωσης -->
+                <div class="mb-4">
+                    <h5 class="text-warning fs-6 mb-3 border-bottom border-secondary pb-2">
+                        <i class="fa-solid fa-house-chimney me-2"></i> Στοιχεία Μίσθωσης
+                    </h5>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <select name="property_kind" class="form-select bg-dark text-light border-secondary" required>
+                                <option value="" disabled selected>Είδος ακινήτου...</option>
+                                <option value="Κατοικία">Κατοικία</option>
+                                <option value="Οικόπεδο">Οικόπεδο</option>
+                                <option value="Αποθήκη">Αποθήκη</option>
+                                <option value="Επαγγελματικός χώρος">Επαγγελματικός χώρος</option>
+                                <option value="Θέση στάθμευσης">Θέση στάθμευσης</option>
+                            </select>
+                        </div>
+                        <div class="col-md-8">
+                            <input type="text" name="property_address" class="form-control bg-dark text-light border-secondary" placeholder="Διεύθυνση ακινήτου" required>
+                        </div>
+                        <div class="col-md-6">
+                            <input type="text" onfocus="(this.type='date')" onblur="(this.value==='' ? this.type='text' : this.type='date')" name="agreement_date" class="form-control bg-dark text-light border-secondary" placeholder="Ημερομηνία συμφωνητικού" required>
+                        </div>
+                        <div class="col-md-6">
+                            <input type="text" name="monthly_rent" class="form-control bg-dark text-light border-secondary" placeholder="Μηνιαίο μίσθωμα (π.χ. 500€)" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Οικονομικές απαιτήσεις & Οφειλές -->             
+                <div class="mb-4">
+                    <h5 class="text-warning fs-6 mb-3 border-bottom border-secondary pb-2">
+                        <i class="fa-solid fa-euro-sign me-2"></i> Οικονομικές απαιτήσεις & Οφειλές
+                    </h5>                
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <input type="text" name="dept_months" class="form-control bg-dark text-light border-secondary" placeholder="Μήνες που οφείλονται" required>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" name="total_dept" class="form-control bg-dark text-light border-secondary" placeholder="Συνολικό οφειλόμενο ποσό" required>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" name="other_bills" class="form-control bg-dark text-light border-secondary" placeholder="Ληξιπρόθεσμοι λογαριασμοί / κοινόχρηστα" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Αίτημα & Προθεσμία -->
+                <div class="mb-4">
+                    <h5 class="text-warning fs-6 mb-3 border-bottom border-secondary pb-2">
+                        <i class="fa-solid fa-calendar-check me-2"></i> Αίτημα & Προθεσμία
+                    </h5>
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <select name="caller_demand" class="form-select bg-dark text-light border-secondary" required>
+                                <option value="" disabled selected>Τελικό Αίτημα...</option>
+                                <option value="Καταβολή οφειλών εντός προθεσμίας">Καταβολή οφειλών εντός προθεσμίας</option>
+                                <option value="Καταβολή οφειλών και απόδοση της χρήσης του μισθίου (έξωση)">Καταβολή οφειλών και απόδοση της χρήσης του μισθίου (έξωση)</option>
+                                <option value="Καταγγελία μίσθωσης λόγω παράβασης όρων">Καταγγελία μίσθωσης λόγω παράβασης όρων</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" onfocus="(this.type='date')" onblur="(this.value==='' ? this.type='text' : this.type='date')" name="compliance_deadline" class="form-control bg-dark text-light border-secondary" placeholder="Προθεσμία Συμμόρφωσης" required>
+                        </div>
+                        <div class="col-md-12">
+                            <textarea name="comments" class="form-control bg-dark text-light border-secondary" rows="4" placeholder="Σχόλια... (Προσθήκη ειδικών περιστάσεων, π.χ. φθορές στο ακίνητο ή μη απάντηση σε μηνύματα)"></textarea>
+                        </div>
+                    </div>
+                </div>
+              
+                <!-- Κουμπιά Υποβολής / Εκκαθάρισης -->
+                <div class="d-flex justify-content-end gap-2">
+                    <input type="reset" value="Εκκαθάριση" class="btn btn-outline-secondary px-4">
+                    <input type="submit" value="Υποβολή" class="btn btn-warning fw-bold px-4 text-dark">
+                </div>
+            </form>
+        </div>
+
+        <!-- Αποτελέσματα Υπόθεσης / Άρθρα -->
+        {% if text %}
+            <div class="p-4 rounded-4 gold-border bg-black border border-warning shadow-lg mt-4">
+                <h3 class="h5 text-warning fw-bold mb-3"><i class="fa-solid fa-scale-balanced me-2"></i> Η υπόθεσή σας υπάγεται στα παρακάτω άρθρα:</h3>
+                <div class="text-light">
+                    {{ text | safe }}
+                </div>
+            </div>
+        {% endif %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-3 text-muted small">
+        <p class="m-0">&copy; 2026 Lex AI. Με επιφύλαξη παντός δικαιώματος.</p>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/form-validation.js') }}"></script>
+</body>
+</html>

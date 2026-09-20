@@ -56,3 +56,14 @@ h1, .brand-title {
     text-decoration: none;
     color: inherit;
 }
+
+.form-control::placeholder, .form-select::placeholder {
+    color: #adb5bd !important;
+    opacity: 1 !important;
+}
+
+/* Προσαρμογή χρώματος για τα disabled options ή επιλογές στο select */
+.form-select option {
+    background-color: #212529;
+    color: #f8f9fa;
+}

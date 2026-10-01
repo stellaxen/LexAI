@@ -41,89 +41,26 @@
                     
                     <div class="text-center mb-4">
                         <h2 class="brand-title h5 text-light">Δημιουργία Φακέλου Υπαγωγής</h2>
-                        <p class="text-light small opacity-75">Συμπληρώστε τα στοιχεία των εμπλεκομένων και την περιγραφή της υπόθεσης.</p>
                     </div>
 
                     <form method="POST" action="{{ url_for('ypagogi') }}">
-                        
-                        <!-- Στοιχεία Καλούντος -->
-                        <h6 class="text-warning mb-3"><i class="fa-solid fa-user me-2"></i>Στοιχεία Καλούντος</h6>
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-4">
-                                <label class="form-label small text-light fw-medium">Όνομα</label>
-                                <input type="text" class="form-control bg-dark text-light border-secondary" name="caller_name" placeholder="Όνομα καλούντος" required>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label small text-light fw-medium">Επώνυμο</label>
-                                <input type="text" class="form-control bg-dark text-light border-secondary" name="caller_surname" placeholder="Επώνυμο καλούντος" required>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label small text-light fw-medium">Πατρώνυμο</label>
-                                <input type="text" class="form-control bg-dark text-light border-secondary" name="caller_fathers_name" placeholder="Όνομα πατρός" required>
-                            </div>
-                            <div class="col-md-8">
-                                <label class="form-label small text-light fw-medium">Διεύθυνση</label>
-                                <input type="text" class="form-control bg-dark text-light border-secondary" name="caller_address" placeholder="Διεύθυνση καλούντος" required>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label small text-light fw-medium">ΑΦΜ</label>
-                                <input type="text" class="form-control bg-dark text-light border-secondary" name="caller_tax_id" placeholder="ΑΦΜ καλούντος" maxlength="9" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
-                            </div>
-                        </div>
-
-                        <hr class="border-secondary my-4">
-
-                        <!-- Στοιχεία Καλούμενου -->
-                        <h6 class="text-warning mb-3"><i class="fa-solid fa-user-shield me-2"></i>Στοιχεία Καλούμενου</h6>
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-4">
-                                <label class="form-label small text-light fw-medium">Όνομα</label>
-                                <input type="text" class="form-control bg-dark text-light border-secondary" name="calling_name" placeholder="Όνομα καλούμενου" required>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label small text-light fw-medium">Επώνυμο</label>
-                                <input type="text" class="form-control bg-dark text-light border-secondary" name="calling_surname" placeholder="Επώνυμο καλούμενου" required>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label small text-light fw-medium">Πατρώνυμο</label>
-                                <input type="text" class="form-control bg-dark text-light border-secondary" name="calling_fathers_name" placeholder="Όνομα πατρός" required>
-                            </div>
-                            <div class="col-md-8">
-                                <label class="form-label small text-light fw-medium">Διεύθυνση</label>
-                                <input type="text" class="form-control bg-dark text-light border-secondary" name="calling_address" placeholder="Διεύθυνση καλούμενου" required>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label small text-light fw-medium">ΑΦΜ</label>
-                                <input type="text" class="form-control bg-dark text-light border-secondary" name="calling_tax_id" placeholder="ΑΦΜ καλούμενου" maxlength="9" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-                            </div>
-                        </div>
-
-                        <hr class="border-secondary my-4">
-
                         <!-- Περιγραφή Υπόθεσης -->
                         <div class="mb-4">
-                            <label class="form-label text-warning fw-bold"><i class="fa-solid fa-pen-nib me-2"></i>Περιγραφή Υπόθεσης</label>
-                            <textarea class="form-control bg-dark text-light border-secondary" name="case_text" placeholder="Περιγραφή υπόθεσης..." rows="6" required></textarea>
-                        </div>
-
-                        <!-- Κουμπιά Υποβολής -->
-                        <div class="d-flex justify-content-between align-items-center">
-                            <input type="reset" value="Εκκαθάριση" class="btn btn-outline-secondary px-4">
-                            <input type="submit" value="Υποβολή" class="btn btn-warning fw-bold px-5 text-dark">
-                        </div>
-
-                    </form>
-
-                    <!-- Αποτελέσματα (Απάντηση AI) -->
-                    {% if text %}
-                        <div class="mt-5 pt-4 border-top border-secondary">
-                            <h3 class="h5 text-warning mb-3"><i class="fa-solid fa-scale-balanced me-2"></i>Η υπόθεσή σας υπάγεται στα παρακάτω άρθρα:</h3>
-                            <div class="p-4 rounded-3 bg-dark border border-secondary text-light">
-                                {{ text | safe }}
+                            <h5 class="text-warning fs-6 mb-3 border-bottom border-secondary pb-2">
+                                <i class="fa-solid fa-calendar-check me-2"></i> Περιγραφή Υπόθεσης / Ιστορικό
+                            </h5>
+                            <div class="row g-3">                        
+                                <div class="col-md-12">
+                                    <textarea name="case_description" class="form-control bg-dark text-light border-secondary" rows="4" placeholder="Σχόλια... (Προσθήκη ειδικών περιστάσεων, π.χ. φθορές στο ακίνητο ή μη απάντηση σε μηνύματα)"></textarea>
+                                </div>
                             </div>
+                        </div>             
+                        <!-- Κουμπιά Υποβολής / Εκκαθάρισης -->
+                        <div class="d-flex justify-content-end gap-2">
+                            <input type="reset" value="Εκκαθάριση" class="btn btn-outline-secondary px-4">
+                            <input type="submit" value="Υποβολή" class="btn btn-warning fw-bold px-4 text-dark">
                         </div>
-                    {% endif %}
-
+                    </form>
                 </div>
             </div>
         </div>

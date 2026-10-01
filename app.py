@@ -22,19 +22,23 @@ def index():
     return render_template('index.html')
 
 
+
 @app.route('/ypagogi', methods={'GET', 'POST'})
 def ypagogi():
     if request.method == 'GET':
         return render_template('ypagogi.html')
     elif request.method == 'POST':
-        rest_prompt = """ΑΠΑΝΤΗΣΕ ΑΠΟΚΛΕΙΣΤΙΚΑ ΚΑΙ ΜΟΝΟ ΜΕ ΕΝΑ ΕΓΚΥΡΟ JSON..."""
-        prompt_text = request.form.get('case_text') + rest_prompt
+        case_text = request.form.get('case_description')  
+        print("Received case description:", case_text)  
+
+        prompt = prompts_lib.ypagogi_prompt(case_text)
+        print(prompt)  # Εκτύπωση του prompt για έλεγχο
+
+        ypagogi_data = func_lib.make_answer(prompt, rag_index)
+        print(ypagogi_data)
         
-        # Υποθέτουμε ότι το rag_index είναι διαθέσιμο (ή το περνάς ανάλογα)
-        case_text = func_lib.make_answer(prompt_text, rag_index) 
-        
-        # Κλήση της κοινής συνάρτησης
-        return file_handling.handle_document_generation(request, "ypagogi.docx", case_text)
+        # Κλήση της κοινής συνάρτησης με το αντίστοιχο docx template
+        return file_handling.create_ypagogi(request, "ypagogi.docx", ypagogi_data)
 
 
 @app.route('/exodiko', methods={'GET', 'POST'})
@@ -42,8 +46,6 @@ def exodiko():
     if request.method == 'GET':
         return render_template('exodiko.html')
     elif request.method == 'POST':
-        # Για δοκιμή ή πραγματική χρήση
-        # case_text = "DOKIMASTIKO KEIMENO GIA TESTING"
         case_text = request.form.get('case_description')  
         print("Received case description:", case_text)  
 
@@ -93,9 +95,24 @@ def asfalistika():
 
 
 
-@app.route('/agogi')
+
+@app.route('/agogi', methods={'GET', 'POST'})
 def agogi():
-    return render_template('agogi.html')
+    if request.method == 'GET':
+        return render_template('agogi.html')
+    elif request.method == 'POST':        
+        case_text = request.form.get('case_description')  
+        print("Received case description:", case_text)  
+
+        prompt = prompts_lib.agogi_prompt(case_text)
+        print(prompt)  # Εκτύπωση του prompt για έλεγχο
+        
+
+        agogi_data = func_lib.make_answer(prompt, rag_index)
+        print(agogi_data)
+        
+        # Κλήση της κοινής συνάρτησης με το αντίστοιχο docx template
+        return file_handling.create_agogi(request, "agogi.docx", agogi_data)
 
 
 if __name__ == '__main__':

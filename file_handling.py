@@ -107,6 +107,53 @@ def create_asfalistika(request, template_docx, asfalistika_data):
         print(f"⚠️ DOCX Generation Exception: {e}")
         return f"Error: {e}", 500
 
+def create_ypagogi(request, template_docx, ypagogi_data):
+    """
+    Κοινή λογική για τη δημιουργία της φόρμας, παραγωγή του docx 
+    και αποστολή του αρχείου Word απευθείας στον browser.
+    """
+    try:
+        # 1. Δημιουργία του αρχείου Word
+        docx_path = docs_lib.generate_ypagogi(template_docx, ypagogi_data)
+        
+        # 2. Αποστολή του docx στον χρήστη
+        return send_docx_file(docx_path)
+
+    except Exception as e:
+        print(f"⚠️ DOCX Generation Exception: {e}")
+        return f"Error: {e}", 500
+
+def create_agogi(request, template_docx, agogi_data):
+    """
+    Κοινή λογική για τη δημιουργία της φόρμας, παραγωγή του docx 
+    και αποστολή του αρχείου Word απευθείας στον browser.
+    """
+    try:
+        # 1. Δημιουργία αντικειμένων Person από τα δεδομένα της φόρμας
+        caller = Person(
+            name=request.form.get('caller_name'),
+            surname=request.form.get('caller_surname'),
+            fathers_name=request.form.get('caller_fathers_name'),
+            address=request.form.get('caller_address'),
+            tax_id=request.form.get('caller_tax_id')
+        )
+        calling = Person(
+            name=request.form.get('calling_name'),
+            surname=request.form.get('calling_surname'),
+            fathers_name=request.form.get('calling_fathers_name'),
+            address=request.form.get('calling_address'),
+            tax_id=request.form.get('calling_tax_id')
+        )
+
+        # 2. Δημιουργία του αρχείου Word
+        docx_path = docs_lib.generate_agogi(template_docx, agogi_data, caller, calling)
+        
+        # 3. Αποστολή του docx στον χρήστη
+        return send_docx_file(docx_path)
+
+    except Exception as e:
+        print(f"⚠️ DOCX Generation Exception: {e}")
+        return f"Error: {e}", 500
 
 
 def send_docx_file(docx_path):

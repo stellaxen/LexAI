@@ -31,11 +31,17 @@ def ypagogi():
         case_text = request.form.get('case_description')  
         print("Received case description:", case_text)  
 
-        prompt = prompts_lib.ypagogi_prompt(case_text)
-        print(prompt)  # Εκτύπωση του prompt για έλεγχο
+        # prompt = prompts_lib.ypagogi_prompt(case_text)
+        # print(prompt)  # Εκτύπωση του prompt για έλεγχο
 
-        ypagogi_data = func_lib.make_answer(prompt, rag_index)
-        print(ypagogi_data)
+        # ypagogi_data = func_lib.make_answer(prompt, rag_index)
+        # print(ypagogi_data)
+
+
+        prompt = prompts_lib.ypagogi_prompt(case_text)
+        ypagogi_data = func_lib.make_answer(
+            case_text, prompt, rag_index
+        )
         
         # Κλήση της κοινής συνάρτησης με το αντίστοιχο docx template
         return file_handling.create_ypagogi(request, "ypagogi.docx", ypagogi_data)
@@ -47,13 +53,12 @@ def exodiko():
         return render_template('exodiko.html')
     elif request.method == 'POST':
         case_text = request.form.get('case_description')  
-        print("Received case description:", case_text)  
+        print("Received case description:", case_text)
 
         prompt = prompts_lib.exodiko_prompt(case_text)
-        print(prompt)  # Εκτύπωση του prompt για έλεγχο
-
-        exodiko_data = func_lib.make_answer(prompt, rag_index)
-        print(exodiko_data)
+        exodiko_data = func_lib.make_answer(
+            case_text, prompt, rag_index
+        )
         
         # Κλήση της κοινής συνάρτησης με το αντίστοιχο docx template
         return file_handling.create_exodiko(request, "exodiko.docx", exodiko_data)
@@ -84,12 +89,9 @@ def asfalistika():
         print("Received case description:", case_text)  
 
         prompt = prompts_lib.asfalistika_prompt(case_text)
-        print(prompt)  # Εκτύπωση του prompt για έλεγχο
-        
-
-        asfalistika_data = func_lib.make_answer(prompt, rag_index)
-        print(asfalistika_data)
-        
+        asfalistika_data = func_lib.make_answer(
+            case_text, prompt, rag_index
+        )
         # Κλήση της κοινής συνάρτησης με το αντίστοιχο docx template
         return file_handling.create_asfalistika(request, "asfalistika.docx", asfalistika_data)
 
@@ -103,13 +105,11 @@ def agogi():
     elif request.method == 'POST':        
         case_text = request.form.get('case_description')  
         print("Received case description:", case_text)  
-
-        prompt = prompts_lib.agogi_prompt(case_text)
-        print(prompt)  # Εκτύπωση του prompt για έλεγχο
         
-
-        agogi_data = func_lib.make_answer(prompt, rag_index)
-        print(agogi_data)
+        prompt = prompts_lib.agogi_prompt(case_text)
+        agogi_data = func_lib.make_answer(
+            case_text, prompt, rag_index
+        )
         
         # Κλήση της κοινής συνάρτησης με το αντίστοιχο docx template
         return file_handling.create_agogi(request, "agogi.docx", agogi_data)

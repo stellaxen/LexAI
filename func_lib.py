@@ -87,73 +87,15 @@ def beautify_answer(raw_string):
     
     return answer
 
-
-# def beautify_answer(raw_string):
-#     cleaned = raw_string.strip()
-
-#     if cleaned.startswith("```json"):
-#         cleaned = cleaned[7:]
-#     elif cleaned.startswith("```"):
-#         cleaned = cleaned[3:]
-
-#     if cleaned.endswith("```"):
-#         cleaned = cleaned[:-3]
-
-#     try:
-#         data = json.loads(cleaned.strip())
-#         if isinstance(data, dict):
-#             answer = ""
-#             for key, value in data.items():
-#                 print(f"Άρθρο: {key}")
-#                 print(f"Κείμενο: {value['κείμενο']}")
-#                 print(f"Αρχείο: {value['αρχείο']}")
-#                 print("-" * 40)
-#                 # Χρησιμοποιούμε απλές αλλαγές γραμμής αντί για HTML tags                
-#                 answer += f"\n\n{key}\n{value['κείμενο']}\nΑρχείο: {value['αρχείο']}\n" 
-#         else:
-#             answer = "Δε βρέθηκε υπαγωγή για την περίπτωση σας."
-            
-#     except json.JSONDecodeError:        
-#         answer = "Δε βρέθηκε υπαγωγή για την περίπτωση σας."
-    
-#     return answer
-
-# def make_answer(case_text, res):    
-#     query_engine = res.as_query_engine(
-#         similarity_top_k=10,
-#         response_mode="compact"
-#     )
-    
-#     response = query_engine.query(case_text)
-#     print("\n--- Απάντηση RAG ---")
-#     print(response)
-
-#     response = str(response)
-#     return beautify_answer(response)
-#     # return response  # Επιστρέφουμε το raw string για περαιτέρω επεξεργασία
-
-
-
-
 # def make_answer(user_input_text, index):
-#     # Βήμα 1: Δημιουργούμε έναν retriever (μόνο για αναζήτηση)
-#     retriever = index.as_retriever(similarity_top_k=3) # Παίρνουμε τα 3 πιο σχετικά κομμάτια
+#     retriever = index.as_retriever(similarity_top_k=3)
+#     # search_query = "κλοπή αυτοκινήτου νομική βάση άρθρα ποινικού κώδικα"
+#     retrieved_nodes = retriever.retrieve(user_input_text)
     
-#     # Κάνουμε αναζήτηση χρησιμοποιώντας ΜΟΝΟ μια σύντομη περίληψη ή λέξεις-κλειδιά 
-#     # (ώστε το embedding να μην ξεπεράσει τα 8192 tokens)
-#     search_query = "κλοπή αυτοκινήτου νομική βάση άρθρα ποινικού κώδικα"
-#     retrieved_nodes = retriever.retrieve(search_query)
-    
-#     # Ενώνουμε το κείμενο από τα RAG chunks που βρέθηκαν
 #     rag_context = "\n\n".join([node.get_content() for node in retrieved_nodes])
     
-#     # Βήμα 2: Συνθέτουμε το τελικό, μεγάλο prompt μας χειροκεντρικά
-#     # (Εδώ μπορείτε να βάλετε όσες οδηγίες, κανόνες και JSON formats θέλετε, 
-#     # καθώς ο gpt-5.6-sol έχει τεράστιο όριο context)
 #     full_prompt = f"""
 #     Είσαι ένας έμπειρος νομικός βοηθός...
-#     [Εδώ βάζετε τις 30 οδηγίες λειτουργίας σας...]
-    
 #     === ΔΙΑΘΕΣΙΜΑ ΑΠΟΣΠΑΣΜΑΤΑ ΝΟΜΩΝ (RAG CONTEXT) ===
 #     {rag_context}
     
@@ -162,55 +104,78 @@ def beautify_answer(raw_string):
     
 #     Απάντησε αποκλειστικά σε μορφή JSON...
 #     """
-    
-#     # Βήμα 3: Στέλνουμε το τελικό prompt απευθείας στον LLM
+
+#     print("\n\n\n[DEBUG] Full prompt sent to LLM:")
+#     print(full_prompt)
+#     print("[DEBUG] End of prompt \n\n\n\n")
+
 #     response = Settings.llm.complete(full_prompt)
+#     raw_text = response.text.strip()
     
-#     return response.text
+#     # Καθαρισμός από τυχόν markdown blocks (```json ... ```)
+#     if raw_text.startswith("```json"):
+#         raw_text = raw_text[7:]
+#     elif raw_text.startswith("```"):
+#         raw_text = raw_text[3:]
+#     if raw_text.endswith("```"):
+#         raw_text = raw_text[:-3]
+        
+#     try:
+#         # Μετατροπή του JSON string σε Python dictionary
+#         data_dict = json.loads(raw_text.strip())
+#         return data_dict
+#     except json.JSONDecodeError:
+#         # Fallback σε περίπτωση που αποτύχει το JSON parsing
+#         return {
+#             "historic_summary": raw_text,
+#             "legal_substantiation": "Σφάλμα ανάλυσης JSON",
+#             "legal_base": "Δεν προκύπτει"
+#         }
 
 
 
-def make_answer(user_input_text, index):
+def make_answer(case_text, prompt, index):
+    # 1. Αναζήτηση με τα πραγματικά περιστατικά,
+    # όχι με όλες τις οδηγίες του prompt.
     retriever = index.as_retriever(similarity_top_k=3)
-    # search_query = "κλοπή αυτοκινήτου νομική βάση άρθρα ποινικού κώδικα"
-    retrieved_nodes = retriever.retrieve(user_input_text)
-    
-    rag_context = "\n\n".join([node.get_content() for node in retrieved_nodes])
-    
+    search_query = case_text[:4000]
+
+    retrieved_nodes = retriever.retrieve(search_query)
+
+    rag_context = "\n\n".join(
+        node.get_content() for node in retrieved_nodes
+    )
+
+    # 2. Προσθήκη της νομοθεσίας στο prompt μόνο μία φορά.
     full_prompt = f"""
-    Είσαι ένας έμπειρος νομικός βοηθός...
-    === ΔΙΑΘΕΣΙΜΑ ΑΠΟΣΠΑΣΜΑΤΑ ΝΟΜΩΝ (RAG CONTEXT) ===
-    {rag_context}
-    
-    === ΠΕΡΙΓΡΑΦΗ ΣΥΜΒΑΝΤΟΣ ΑΠΟ ΧΡΗΣΤΗ ===
-    {user_input_text}
-    
-    Απάντησε αποκλειστικά σε μορφή JSON...
-    """
+{prompt}
 
-    print("\n\n\n[DEBUG] Full prompt sent to LLM:")
-    print(full_prompt)
-    print("[DEBUG] End of prompt \n\n\n\n")
+=== ΣΧΕΤΙΚΑ ΑΠΟΣΠΑΣΜΑΤΑ ΝΟΜΟΘΕΣΙΑΣ ===
+{rag_context}
+"""
 
+    # Μην καταγράφεις ολόκληρο το prompt στα logs.
+    print(
+        f"[INFO] Case chars: {len(case_text)}, "
+        f"prompt chars: {len(full_prompt)}, "
+        f"RAG chunks: {len(retrieved_nodes)}"
+    )
+
+    # 3. Κλήση του μοντέλου.
     response = Settings.llm.complete(full_prompt)
     raw_text = response.text.strip()
-    
-    # Καθαρισμός από τυχόν markdown blocks (```json ... ```)
+
     if raw_text.startswith("```json"):
         raw_text = raw_text[7:]
     elif raw_text.startswith("```"):
         raw_text = raw_text[3:]
+
     if raw_text.endswith("```"):
         raw_text = raw_text[:-3]
-        
+
     try:
-        # Μετατροπή του JSON string σε Python dictionary
-        data_dict = json.loads(raw_text.strip())
-        return data_dict
-    except json.JSONDecodeError:
-        # Fallback σε περίπτωση που αποτύχει το JSON parsing
-        return {
-            "historic_summary": raw_text,
-            "legal_substantiation": "Σφάλμα ανάλυσης JSON",
-            "legal_base": "Δεν προκύπτει"
-        }
+        return json.loads(raw_text.strip())
+    except json.JSONDecodeError as exc:
+        raise ValueError(
+            "Το μοντέλο δεν επέστρεψε έγκυρο JSON."
+        ) from exc

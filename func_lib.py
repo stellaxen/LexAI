@@ -4,25 +4,35 @@ from llama_index.core.node_parser import SentenceSplitter
 from llama_index.llms.openai import OpenAI
 from llama_index.embeddings.openai import OpenAIEmbedding
 
+
 def initialize_rag_system(data_dir="./legal_docs", api_key=None):
-    # Ορίζουμε τοπικά για τη διαδικασία, αν χρειαστεί, αλλά κυρίως το περνάμε στα αντικείμενα
+    # 1. Ρύθμιση LLM με προσθήκη timeout=120.0
     Settings.llm = OpenAI(
-        model="gpt-4o", 
+        model="gpt-5.6-sol", 
         temperature=0,
-        api_key=api_key,  
+        api_key=api_key,
+        timeout=6000.0,  # <--- Timeout (σε δευτερόλεπτα)
         additional_kwargs={"response_format": {"type": "json_object"}}
     )
+    
+    # 2. Ρύθμιση Embedding Model (μπορείτε να προσθέσετε timeout και εδώ αν χρειαστεί)
     Settings.embed_model = OpenAIEmbedding(
         model="text-embedding-3-large",
-        api_key=api_key   # <--- Και εδώ το δικό σας κλειδί
+        api_key=api_key
     )
-    Settings.node_parser = SentenceSplitter(chunk_size=512, chunk_overlap=50)
+    
+    # 3. Ορισμός SentenceSplitter για το Chunking
+    parser = SentenceSplitter(chunk_size=512, chunk_overlap=50)
+    Settings.node_parser = parser
     
     print("[INFO] Loading legal documents...")
     documents = SimpleDirectoryReader(data_dir).load_data()
     
-    print("[INFO] Building vector index...")
-    index = VectorStoreIndex.from_documents(documents)
+    print("[INFO] Parsing documents into chunks (nodes)...")
+    nodes = parser.get_nodes_from_documents(documents)
+    
+    print(f"[INFO] Created {len(nodes)} chunks. Building vector index...")
+    index = VectorStoreIndex(nodes)
     
     return index
 
@@ -108,19 +118,99 @@ def beautify_answer(raw_string):
     
 #     return answer
 
-def make_answer(case_text, res):    
-    query_engine = res.as_query_engine(
-        similarity_top_k=10,
-        response_mode="compact"
-    )
+# def make_answer(case_text, res):    
+#     query_engine = res.as_query_engine(
+#         similarity_top_k=10,
+#         response_mode="compact"
+#     )
     
-    response = query_engine.query(case_text)
-    print("\n--- Απάντηση RAG ---")
-    print(response)
+#     response = query_engine.query(case_text)
+#     print("\n--- Απάντηση RAG ---")
+#     print(response)
 
-    response = str(response)
-    return beautify_answer(response)
-    # return response  # Επιστρέφουμε το raw string για περαιτέρω επεξεργασία
+#     response = str(response)
+#     return beautify_answer(response)
+#     # return response  # Επιστρέφουμε το raw string για περαιτέρω επεξεργασία
 
 
 
+
+# def make_answer(user_input_text, index):
+#     # Βήμα 1: Δημιουργούμε έναν retriever (μόνο για αναζήτηση)
+#     retriever = index.as_retriever(similarity_top_k=3) # Παίρνουμε τα 3 πιο σχετικά κομμάτια
+    
+#     # Κάνουμε αναζήτηση χρησιμοποιώντας ΜΟΝΟ μια σύντομη περίληψη ή λέξεις-κλειδιά 
+#     # (ώστε το embedding να μην ξεπεράσει τα 8192 tokens)
+#     search_query = "κλοπή αυτοκινήτου νομική βάση άρθρα ποινικού κώδικα"
+#     retrieved_nodes = retriever.retrieve(search_query)
+    
+#     # Ενώνουμε το κείμενο από τα RAG chunks που βρέθηκαν
+#     rag_context = "\n\n".join([node.get_content() for node in retrieved_nodes])
+    
+#     # Βήμα 2: Συνθέτουμε το τελικό, μεγάλο prompt μας χειροκεντρικά
+#     # (Εδώ μπορείτε να βάλετε όσες οδηγίες, κανόνες και JSON formats θέλετε, 
+#     # καθώς ο gpt-5.6-sol έχει τεράστιο όριο context)
+#     full_prompt = f"""
+#     Είσαι ένας έμπειρος νομικός βοηθός...
+#     [Εδώ βάζετε τις 30 οδηγίες λειτουργίας σας...]
+    
+#     === ΔΙΑΘΕΣΙΜΑ ΑΠΟΣΠΑΣΜΑΤΑ ΝΟΜΩΝ (RAG CONTEXT) ===
+#     {rag_context}
+    
+#     === ΠΕΡΙΓΡΑΦΗ ΣΥΜΒΑΝΤΟΣ ΑΠΟ ΧΡΗΣΤΗ ===
+#     {user_input_text}
+    
+#     Απάντησε αποκλειστικά σε μορφή JSON...
+#     """
+    
+#     # Βήμα 3: Στέλνουμε το τελικό prompt απευθείας στον LLM
+#     response = Settings.llm.complete(full_prompt)
+    
+#     return response.text
+
+
+
+def make_answer(user_input_text, index):
+    retriever = index.as_retriever(similarity_top_k=3)
+    # search_query = "κλοπή αυτοκινήτου νομική βάση άρθρα ποινικού κώδικα"
+    retrieved_nodes = retriever.retrieve(user_input_text)
+    
+    rag_context = "\n\n".join([node.get_content() for node in retrieved_nodes])
+    
+    full_prompt = f"""
+    Είσαι ένας έμπειρος νομικός βοηθός...
+    === ΔΙΑΘΕΣΙΜΑ ΑΠΟΣΠΑΣΜΑΤΑ ΝΟΜΩΝ (RAG CONTEXT) ===
+    {rag_context}
+    
+    === ΠΕΡΙΓΡΑΦΗ ΣΥΜΒΑΝΤΟΣ ΑΠΟ ΧΡΗΣΤΗ ===
+    {user_input_text}
+    
+    Απάντησε αποκλειστικά σε μορφή JSON...
+    """
+
+    print("\n\n\n[DEBUG] Full prompt sent to LLM:")
+    print(full_prompt)
+    print("[DEBUG] End of prompt \n\n\n\n")
+
+    response = Settings.llm.complete(full_prompt)
+    raw_text = response.text.strip()
+    
+    # Καθαρισμός από τυχόν markdown blocks (```json ... ```)
+    if raw_text.startswith("```json"):
+        raw_text = raw_text[7:]
+    elif raw_text.startswith("```"):
+        raw_text = raw_text[3:]
+    if raw_text.endswith("```"):
+        raw_text = raw_text[:-3]
+        
+    try:
+        # Μετατροπή του JSON string σε Python dictionary
+        data_dict = json.loads(raw_text.strip())
+        return data_dict
+    except json.JSONDecodeError:
+        # Fallback σε περίπτωση που αποτύχει το JSON parsing
+        return {
+            "historic_summary": raw_text,
+            "legal_substantiation": "Σφάλμα ανάλυσης JSON",
+            "legal_base": "Δεν προκύπτει"
+        }

@@ -22,8 +22,8 @@
             <a href="/" class="position-absolute start-0 top-0 text-primary text-decoration-none d-flex align-items-center gap-2 mt-2">
                 <i class="fa-solid fa-arrow-left"></i> <span class="d-none d-sm-inline">Αρχική</span>
             </a>
-            <img src="/static/images/lexlogo.jpg" alt="LEX AI Logo" width="75" class="rounded-circle shadow-sm border border-primary mb-3" style="border-width: 2px !important;">
-            <h1 class="h2 m-0 text-dark fw-bold">Εξώδικο - Lex AI</h1>
+            <img src="/static/images/lexlogo.jpg" alt="LEX AI Logo" width="75" class="rounded-circle shadow-sm border border-primary mb-3" style="border-width: 2px !important;">            
+            <h1 class="h2 m-0 text-dark fw-bold">Υπαγωγή - Lex AI</h1>
             <div class="mt-2 header-divider"></div>
         </div>
     </header>
@@ -36,8 +36,20 @@
                     
                     <div class="text-center mb-4">
                         <h2 class="h5 text-dark fw-bold">Δημιουργία Φακέλου Υπαγωγής</h2>
-                        <p class="text-muted small">Συμπληρώστε τα στοιχεία της υπόθεσης για την αυτόματη σύνταξη του εγγράφου.</p>
+                        <p class="text-muted small">
+                            Περιγράψτε αρχικά τα πραγματικά περιστατικά. Θα ακολουθήσουν στοχευμένες ερωτήσεις για τη νομική υπαγωγή.
+                        </p>
                     </div>
+
+                    {% with messages = get_flashed_messages() %}
+                        {% if messages %}
+                            <div class="alert alert-warning">
+                                {% for message in messages %}
+                                    <div>{{ message }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    {% endwith %}
 
                     <form method="POST" action="/ypagogi">
                         <!-- Περιγραφή Υπόθεσης -->
@@ -47,7 +59,14 @@
                             </h5>
                             <div class="row g-3">                        
                                 <div class="col-md-12">
-                                    <textarea name="case_description" class="form-control bg-light text-dark border" rows="4" placeholder="Σχόλια... (Προσθήκη ειδικών περιστάσεων, π.χ. φθορές στο ακίνητο ή μη απάντηση σε μηνύματα)"></textarea>
+                                    <textarea
+                                        name="case_description"
+                                        class="form-control bg-light text-dark border"
+                                        rows="7"
+                                        required
+                                        minlength="20"
+                                        placeholder="Περιγράψτε με χρονολογική σειρά τι συνέβη, ποιοι εμπλέκονται, πότε και πού, ποιες ενέργειες έγιναν και ποιο αποτέλεσμα επιδιώκετε."
+                                    ></textarea>
                                 </div>
                             </div>
                         </div>             

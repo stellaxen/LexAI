@@ -115,21 +115,58 @@ def generate_asfalistika(filename, asfalistika_data, caller: Person, calling: Pe
 #     return make_pdf(doc, context)
 
 
+
 def generate_ypagogi(filename, ypagogi_data):
-    template_path = os.path.join("templates_files", filename)
+
+    template_path = os.path.join(
+        "templates_files",
+        filename
+    )
+
     if not os.path.exists(template_path):
-        raise FileNotFoundError(f"Το αρχείο πρότυπο δεν βρέθηκε στο: {template_path}")
-        
-    doc = DocxTemplate(template_path)    
-    
-    context = {        
+        raise FileNotFoundError(
+            f"Το αρχείο πρότυπο δεν βρέθηκε στο: {template_path}"
+        )
+
+    doc = DocxTemplate(template_path)
+
+    legal_base = ypagogi_data.get(
+        "legal_base",
+        "Δεν προκύπτει από το ιστορικό"
+    )
+
+    context = {
         "date": datetime.now().strftime("%d/%m/%Y"),
-        "historic_summary": ypagogi_data.get("historic_summary", "Δεν προκύπτει από το ιστορικό"),
-        "legal_substantiation": ypagogi_data.get("legal_substantiation", "Δεν προκύπτει από το ιστορικό"),
-        "s": ypagogi_data.get("legal_base", "Δεν προκύπτει από το ιστορικό"),
+
+        "historic_summary": ypagogi_data.get(
+            "historic_summary",
+            "Δεν προκύπτει από το ιστορικό"
+        ),
+
+        "legal_substantiation": ypagogi_data.get(
+            "legal_substantiation",
+            "Δεν προκύπτει από το ιστορικό"
+        ),
+
+        # Το υπάρχον πρότυπο DOCX χρησιμοποιεί το placeholder s.
+        "s": legal_base,
+
+        # Διατηρούμε και το κανονικό όνομα του πεδίου.
+        "legal_base": legal_base,
+
+        "aitoumena_zitimata": ypagogi_data.get(
+            "aitoumena_zitimata",
+            "Δεν προκύπτει από το ιστορικό"
+        ),
+
+        "prothesmia_symmorfosis": ypagogi_data.get(
+            "prothesmia_symmorfosis",
+            "Δεν προκύπτει από το ιστορικό"
+        ),
     }
 
     return make_pdf(doc, context)
+
 
 def generate_agogi(filename, agogi_data, caller: Person, calling: Person):
     template_path = os.path.join("templates_files", filename)
